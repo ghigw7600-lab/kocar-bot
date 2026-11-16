@@ -193,9 +193,10 @@ function openCar(id) {
   track("car");
 }
 function closeCar() { $("sheet").classList.remove("open"); }
+const BOT_FALLBACK = "kocarautobot"; // 서버가 봇 이름을 못 받아 왔을 때 예비
 function go(start) {
-  const link = `https://t.me/${data?.bot || ""}?start=${start}`;
-  if (tg?.openTelegramLink && data?.bot) { tg.openTelegramLink(link); setTimeout(() => tg.close(), 300); }
+  const link = `https://t.me/${data?.bot || BOT_FALLBACK}?start=${start}`;
+  if (tg?.openTelegramLink) { tg.openTelegramLink(link); setTimeout(() => tg.close(), 300); }
   else window.open(link, "_blank");
 }
 function track() {}
