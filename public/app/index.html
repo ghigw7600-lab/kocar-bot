@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>KOCAR</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #f5f6f8; --card: #fff; --text: #14181f; --sub: #5f6b7a; --line: #e4e7ec;
+    --red: #d7262e; --redbg: #fdecec; --ok: #137a4b;
+  }
+  .dark { --bg: #0f1216; --card: #191d23; --text: #eef1f5; --sub: #9aa5b3; --line: #2a3038; --redbg: #3a1517; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.45; }
+  .wrap { max-width: 560px; margin: 0 auto; padding: 16px 16px 96px; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .logo { font-weight: 800; font-size: 24px; letter-spacing: -0.5px; line-height: 1; }
+  .logo .ko { color: var(--red); }
+  .logo small { display: block; font-size: 9.5px; letter-spacing: 2.2px; font-weight: 600; color: var(--sub); margin-top: 4px; }
+  .lang { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .lang button { border: 0; background: none; color: var(--sub); font: inherit; font-size: 13px; padding: 6px 10px; min-height: 34px; }
+  .lang button.on { background: var(--text); color: var(--bg); }
+  .hero { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+  .hero h1 { font-size: 18px; margin: 0 0 4px; font-weight: 700; letter-spacing: -0.2px; }
+  .hero p { margin: 0 0 14px; color: var(--sub); font-size: 13.5px; }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .step { text-align: center; font-size: 11.5px; color: var(--sub); }
+  .step b { display: grid; place-items: center; width: 26px; height: 26px; margin: 0 auto 4px; border-radius: 50%; background: var(--redbg); color: var(--red); font-size: 12px; }
+  .chips { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; margin-bottom: 8px; scrollbar-width: none; }
+  .chip { flex: none; border: 1px solid var(--line); background: var(--card); color: var(--text); border-radius: 999px; padding: 7px 13px; font: inherit; font-size: 13px; min-height: 36px; }
+  .chip.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .list { display: grid; gap: 10px; margin-top: 6px; }
+  .car { display: grid; grid-template-columns: 52px 1fr; gap: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; text-align: left; font: inherit; color: inherit; width: 100%; }
+  .ico { width: 52px; height: 52px; border-radius: 12px; background: var(--bg); display: grid; place-items: center; color: var(--sub); }
+  .car h3 { margin: 0; font-size: 15.5px; font-weight: 600; }
+  .meta { color: var(--sub); font-size: 13px; margin-top: 1px; }
+  .prices { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 8px; gap: 8px; }
+  .prices .kr { font-size: 12.5px; color: var(--sub); }
+  .prices .tot { text-align: right; }
+  .prices .tot span { display: block; font-size: 11.5px; color: var(--sub); }
+  .prices .tot strong { font-size: 17px; font-weight: 700; }
+  .empty, .err { text-align: center; color: var(--sub); padding: 28px 12px; background: var(--card); border: 1px dashed var(--line); border-radius: 14px; }
+  .btn { display: block; width: 100%; border: 0; border-radius: 12px; padding: 14px; font: inherit; font-weight: 600; font-size: 15px; min-height: 48px; text-align: center; }
+  .btn.primary { background: var(--red); color: #fff; }
+  .btn.ghost { background: var(--card); color: var(--text); border: 1px solid var(--line); }
+  .find { margin-top: 16px; }
+  .note { font-size: 11.5px; color: var(--sub); margin-top: 14px; text-align: center; }
+  .sheet { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: flex-end; z-index: 10; }
+  .sheet.open { display: flex; }
+  .panel { background: var(--card); width: 100%; max-width: 560px; margin: 0 auto; border-radius: 18px 18px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); max-height: 92vh; overflow-y: auto; animation: up .2s ease-out; }
+  @keyframes up { from { transform: translateY(30px); opacity: .4; } }
+  .panel h2 { margin: 0; font-size: 19px; }
+  .rows { margin: 14px 0; border-top: 1px solid var(--line); }
+  .row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .row span:first-child { color: var(--sub); }
+  .row.sub { padding: 4px 0 4px 12px; font-size: 12.5px; border: 0; }
+  .row.total { border-bottom: 0; font-weight: 700; font-size: 17px; }
+  .row.total span:first-child { color: var(--text); }
+  .panel .btn + .btn { margin-top: 8px; }
+  .x { float: right; border: 0; background: var(--bg); color: var(--sub); width: 34px; height: 34px; border-radius: 50%; font-size: 18px; }
+  .skel { height: 104px; border-radius: 14px; background: linear-gradient(90deg, var(--card), var(--line), var(--card)); background-size: 200% 100%; animation: sh 1.2s infinite; }
+  @keyframes sh { to { background-position: -200% 0; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo"><span class="ko">KO</span>CAR<small>CARS FROM KOREA</small></div>
+    <div class="lang"><button data-l="uz">UZ</button><button data-l="ru">RU</button></div>
+  </header>
+
+  <section class="hero">
+    <h1 id="h1"></h1>
+    <p id="h2"></p>
+    <div class="steps" id="steps"></div>
+  </section>
+
+  <div class="chips" id="brands"></div>
+  <div class="chips" id="budgets"></div>
+  <div class="list" id="list"><div class="skel"></div><div class="skel"></div></div>
+
+  <button class="btn ghost find" id="find"></button>
+  <p class="note" id="note"></p>
+</div>
+
+<div class="sheet" id="sheet"><div class="panel" id="panel"></div></div>
+
+<script>
+const tg = window.Telegram?.WebApp;
+tg?.ready(); tg?.expand();
+if (tg?.colorScheme === "dark") document.documentElement.classList.add("dark");
+tg?.onEvent?.("themeChanged", () => document.documentElement.classList.toggle("dark", tg.colorScheme === "dark"));
+
+const T = {
+  uz: {
+    h1: "Koreyadan mashina — Toshkentgacha jami narxi bilan",
+    h2: "Encar va K Car'dagi mashinalarni tanlang, qolganini o'zimiz qilamiz.",
+    steps: ["Tanlaysiz", "Tekshiramiz", "Yuboramiz", "Bojxona"],
+    all: "Hammasi", budgets: ["≤ $30 ming", "$30–40 ming", "$40 ming+"],
+    kr: "Koreyada", total: "Toshkentgacha jami", mln: "mln ₩", km: "km",
+    fuel: { gasoline: "Benzin", lpg: "Gaz", hybrid: "Gibrid", ev: "Elektr", diesel: "Dizel" },
+    rCar: "Mashina narxi", rKorea: "Koreyadagi xarajatlar", rShip: "Yetkazib berish", rCustoms: "Bojxona to'lovlari",
+    rDuty: "boj", rVat: "QQS", rUtil: "utilizatsiya", rOther: "yig'im va sertifikat", rKocar: "KOCAR xizmati", rTotal: "Jami",
+    ask: "Shu mashinani olib bering", source: (s) => `${s}'da ko'rish (rasmlar)`,
+    checked: "Tekshirilgan sana", find: "🔎 Kerakli mashinani topib beramiz",
+    empty: "Hozircha mashinalar yo'q. Kerakli mashinani topib beramiz 👇",
+    err: "Yuklab bo'lmadi.", retry: "Qayta urinish",
+    note: "Narxlar taxminiy: valyuta kursi va bojxona qoidalariga qarab o'zgarishi mumkin. Aniq narxni yozib so'rang.",
+    manual: "aniq hisoblangan",
+  },
+  ru: {
+    h1: "Авто из Кореи — с итоговой ценой до Ташкента",
+    h2: "Выбирайте машины с Encar и K Car, остальное сделаем мы.",
+    steps: ["Выбор", "Проверка", "Доставка", "Растаможка"],
+    all: "Все", budgets: ["≤ $30 тыс", "$30–40 тыс", "$40 тыс+"],
+    kr: "В Корее", total: "Итого до Ташкента", mln: "млн ₩", km: "км",
+    fuel: { gasoline: "Бензин", lpg: "Газ", hybrid: "Гибрид", ev: "Электро", diesel: "Дизель" },
+    rCar: "Цена машины", rKorea: "Расходы в Корее", rShip: "Доставка", rCustoms: "Таможенные платежи",
+    rDuty: "пошлина", rVat: "НДС", rUtil: "утильсбор", rOther: "сбор и сертификат", rKocar: "Услуга KOCAR", rTotal: "Итого",
+    ask: "Хочу эту машину", source: (s) => `Смотреть на ${s} (фото)`,
+    checked: "Проверено", find: "🔎 Подобрать машину под заказ",
+    empty: "Пока машин нет. Подберём под ваш запрос 👇",
+    err: "Не удалось загрузить.", retry: "Повторить",
+    note: "Цены ориентировочные: зависят от курса и таможенных правил. Точную цену уточняйте у нас.",
+    manual: "точный расчёт",
+  },
+};
+const params = new URLSearchParams(location.search);
+let lang = params.get("lang") || (/^(ru|ky|kk|be|uk|tg)/.test(tg?.initDataUnsafe?.user?.language_code || "") ? "ru" : "uz");
+try { lang = localStorage.getItem("kocar-lang") || lang; } catch {}
+let data = null, brand = "all", budget = -1;
+const $ = (id) => document.getElementById(id);
+const usd = (n) => "$" + Math.round(n).toLocaleString("en-US").replace(/,/g, " ");
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const carIcon = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3v-5l2-5h11l4 5h1v5h-2"/><circle cx="7.5" cy="17" r="2"/><circle cx="16.5" cy="17" r="2"/><path d="M9.5 17h5M6 12h14"/></svg>';
+
+function text() {
+  const L = T[lang];
+  document.documentElement.lang = lang;
+  document.querySelectorAll(".lang button").forEach((b) => b.classList.toggle("on", b.dataset.l === lang));
+  $("h1").textContent = L.h1; $("h2").textContent = L.h2;
+  $("steps").innerHTML = L.steps.map((s, i) => `<div class="step"><b>${i + 1}</b>${esc(s)}</div>`).join("");
+  $("find").textContent = L.find; $("note").textContent = L.note;
+}
+function inBudget(c) {
+  const t = c.calc.total;
+  return budget < 0 || (budget === 0 ? t <= 30000 : budget === 1 ? t > 30000 && t <= 40000 : t > 40000);
+}
+function render() {
+  text();
+  const L = T[lang];
+  if (!data) return;
+  const brands = [...new Set(data.cars.map((c) => c.brand))];
+  $("brands").innerHTML = ["all", ...brands].map((b) => `<button class="chip ${b === brand ? "on" : ""}" data-b="${esc(b)}">${b === "all" ? L.all : esc(b)}</button>`).join("");
+  $("budgets").innerHTML = L.budgets.map((b, i) => `<button class="chip ${i === budget ? "on" : ""}" data-u="${i}">${b}</button>`).join("");
+  const cars = data.cars.filter((c) => (brand === "all" || c.brand === brand) && inBudget(c));
+  $("list").innerHTML = cars.length
+    ? cars.map((c) => `<button class="car" data-id="${c.id}"><div class="ico">${carIcon}</div><div>
+        <h3>${esc(c.model)} · ${c.year}</h3>
+        <div class="meta">${Math.round(c.km).toLocaleString("en-US").replace(/,/g, " ")} ${L.km} · ${L.fuel[c.fuel] || ""}${c.cc ? ` · ${(c.cc / 1000).toFixed(1)} L` : ""}</div>
+        <div class="prices"><div class="kr">${L.kr}<br>${(c.priceWon / 1e6).toFixed(1).replace(".", ",")} ${L.mln}</div>
+        <div class="tot"><span>${L.total}</span><strong>≈ ${usd(c.calc.total)}</strong></div></div></div></button>`).join("")
+    : `<div class="empty">${L.empty}</div>`;
+}
+function openCar(id) {
+  const c = data.cars.find((x) => x.id === id);
+  if (!c) return;
+  const L = T[lang], r = c.calc, p = r.customsParts;
+  const sub = (k, v) => (r.customsManual ? "" : `<div class="row sub"><span>· ${k}</span><span>${usd(v)}</span></div>`);
+  const d = c.checkedAt ? new Date(c.checkedAt) : null;
+  $("panel").innerHTML = `<button class="x" id="close" aria-label="close">×</button>
+    <h2>${esc(c.model)} · ${c.year}</h2>
+    <div class="meta">${Math.round(c.km).toLocaleString("en-US").replace(/,/g, " ")} ${L.km} · ${L.fuel[c.fuel] || ""}${c.cc ? ` · ${c.cc} cc` : ""}</div>
+    <div class="rows">
+      <div class="row"><span>${L.rCar}</span><span>${usd(r.car)}</span></div>
+      <div class="row"><span>${L.rKorea}</span><span>${usd(r.korea)}</span></div>
+      <div class="row"><span>${L.rShip}</span><span>${usd(r.ship)}</span></div>
+      <div class="row"><span>${L.rCustoms}${r.customsManual ? ` (${L.manual})` : ""}</span><span>${usd(r.customs)}</span></div>
+      ${sub(L.rDuty, p.duty)}${sub(L.rVat, p.vat)}${sub(L.rUtil, p.util)}${sub(L.rOther, p.fee + p.cert)}
+      <div class="row"><span>${L.rKocar}</span><span>${usd(r.kocar)}</span></div>
+      <div class="row total"><span>${L.rTotal}</span><span>≈ ${usd(r.total)}</span></div>
+    </div>
+    <button class="btn primary" id="ask">${L.ask}</button>
+    <button class="btn ghost" id="src">${L.source(c.source)}</button>
+    <p class="note">${d ? `${L.checked}: ${String(d.getDate()).padStart(2, "0")}.${String(d.getMonth() + 1).padStart(2, "0")} · ` : ""}${L.note}</p>`;
+  $("sheet").classList.add("open");
+  $("close").onclick = closeCar;
+  $("ask").onclick = () => go(`car-${c.id}`);
+  $("src").onclick = () => (tg?.openLink ? tg.openLink(c.url) : window.open(c.url, "_blank"));
+  track("car");
+}
+function closeCar() { $("sheet").classList.remove("open"); }
+function go(start) {
+  const link = `https://t.me/${data?.bot || ""}?start=${start}`;
+  if (tg?.openTelegramLink && data?.bot) { tg.openTelegramLink(link); setTimeout(() => tg.close(), 300); }
+  else window.open(link, "_blank");
+}
+function track() {}
+
+document.addEventListener("click", (e) => {
+  const b = e.target.closest("[data-b]"), u = e.target.closest("[data-u]"), car = e.target.closest(".car"), l = e.target.closest("[data-l]");
+  if (b) { brand = b.dataset.b; render(); }
+  if (u) { const i = Number(u.dataset.u); budget = budget === i ? -1 : i; render(); }
+  if (car) openCar(car.dataset.id);
+  if (l) { lang = l.dataset.l; try { localStorage.setItem("kocar-lang", lang); } catch {} render(); }
+  if (e.target.id === "sheet") closeCar();
+  if (e.target.id === "find") go("find");
+  if (e.target.id === "retry") load();
+});
+
+async function load(tries = 2) {
+  $("list").innerHTML = '<div class="skel"></div><div class="skel"></div>';
+  try {
+    const r = await fetch("/api/app-data", { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    data = await r.json();
+    render();
+  } catch (e) {
+    if (tries > 0) return setTimeout(() => load(tries - 1), 800);
+    $("list").innerHTML = `<div class="err">${T[lang].err}<br><br><button class="btn ghost" id="retry">${T[lang].retry}</button></div>`;
+  }
+}
+text();
+load();
+</script>
+</body>
+</html>

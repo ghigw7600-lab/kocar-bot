@@ -1,0 +1,10 @@
+# KOCAR 봇 (kocar-bot)
+- 대표는 개발자가 아니다. 답변·문구·커밋 설명은 한국어로. 토큰·비밀값은 저장소에 넣지 않음.
+- 사업: 한국 중고차 → 우즈벡(키르기스) 개인 고객 직구(B2C). 러시아 제외. 상호 KOCAR (KO 빨강 · CAR 검정, CARS FROM KOREA).
+- 구조는 GIEC 봇(giec-telegram-bot)을 줄인 것: grammY + Vercel + Redis(prefix `kocar:`).
+  - `src/bot.js` 손님(/start, 미니앱, 차 찾기, 자유 글 → 상담방) · 대표(링크 → 매물 올리기, /cars /settings /set /customs /test) · 상담방 답장
+  - `src/calc.js` 타슈켄트 도착가: 차값 + 한국 비용 + 운송 + 통관(관세 %+$/cc, 부가세 12%, 재활용세 BRV, 수수료, 인증) + KOCAR 수수료. 기본값은 인터넷 자료라 대표가 /set 으로 수정
+  - `src/cars.js` 매물(kv car:<id>, 집합 cars), `src/customers.js` 손님·상담방 주제, `src/i18n.js` uz·ru 문구
+  - `api/app-data.js` 미니앱 데이터(60초 캐시), `public/app/index.html` 미니앱
+- ★ 엔카·케이카 사진·글을 긁어 오지 말 것 (네이버 vs 다윈프로퍼티 판결 2025-12). 대표 입력 정보 + 원본 링크만.
+- 문구는 uz·ru 둘 다, 짧은 표준어. 현지인 검수 권장.
