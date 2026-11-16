@@ -2,14 +2,15 @@
 import { allCars, sourceOf } from "../src/cars.js";
 import { getSettings, calcTotal } from "../src/calc.js";
 
-let botName = process.env.BOT_USERNAME || "Kocarautobot";
+// 봇 아이디는 텔레그램에 직접 물어서 씀 (환경변수 철자가 틀려도 버튼이 엉뚱한 봇으로 가지 않게)
+let botName = null;
 async function botUsername() {
   if (botName) return botName;
   try {
     const r = await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/getMe`).then((x) => x.json());
     botName = r.result?.username ?? null;
   } catch {}
-  return botName;
+  return botName ?? process.env.BOT_USERNAME ?? null;
 }
 
 export default async function handler(req, res) {
