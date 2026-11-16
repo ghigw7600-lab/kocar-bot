@@ -15,7 +15,7 @@ import { getSettings, setSetting, calcTotal, SETTING_LABELS } from "./calc.js";
 import { groupId, esc, getCustomer, saveCustomer, touchCustomer, customerOfThread, inTopic, postCard } from "./customers.js";
 import { toKorean } from "./translate.js";
 
-const token = process.env.BOT_TOKEN;
+const token = String(process.env.BOT_TOKEN ?? "").trim().replace(/^BOT_TOKEN\s*=\s*/i, ""); // 앞뒤 띄어쓰기·"BOT_TOKEN=" 실수 방지
 if (!token) throw new Error("BOT_TOKEN 이 없습니다.");
 export const bot = new Bot(token);
 

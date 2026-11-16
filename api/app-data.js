@@ -7,7 +7,7 @@ let botName = null;
 async function botUsername() {
   if (botName) return botName;
   try {
-    const r = await fetch(`https://api.telegram.org/bot${process.env.BOT_TOKEN}/getMe`).then((x) => x.json());
+    const r = await fetch(`https://api.telegram.org/bot${String(process.env.BOT_TOKEN ?? "").trim().replace(/^BOT_TOKEN\s*=\s*/i, "")}/getMe`).then((x) => x.json());
     botName = r.result?.username ?? null;
   } catch {}
   return botName ?? process.env.BOT_USERNAME ?? null;

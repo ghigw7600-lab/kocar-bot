@@ -25,8 +25,13 @@ export default async function handler(req, res) {
 
   const host = req.headers["x-forwarded-host"] || req.headers.host;
   const base = process.env.WEBHOOK_URL ? new URL("/", process.env.WEBHOOK_URL).href : `https://${host}/`;
-  const api = new Bot(BOT_TOKEN).api;
+  const api = new Bot(BOT_TOKEN.trim().replace(/^BOT_TOKEN\s*=\s*/i, "")).api;
   const log = [];
+  // 토큰 점검 (비밀 부분은 안 보여 줌): 봇 번호 · 글자 수 · 띄어쓰기/앞에 붙은 글자
+  const raw = BOT_TOKEN;
+  const tk = raw.trim().replace(/^BOT_TOKEN\s*=\s*/i, "");
+  log.push(`ℹ️ Vercel 토큰: 봇 번호 ${tk.split(":")[0]} · ${tk.length}글자${raw !== raw.trim() ? " · ⚠️ 앞뒤에 띄어쓰기/줄바꿈 있음" : ""}${/^BOT_TOKEN/i.test(raw.trim()) ? " · ⚠️ 앞에 BOT_TOKEN= 이 붙어 있음" : ""}${/^\d+:[\w-]{30,}$/.test(tk) ? "" : " · ⚠️ 토큰 모양이 아님"}`);
+  log.push("   → BotFather /mybots → 봇 → API Token 의 앞 숫자와 같은지 비교\n");
   const step = async (label, fn) => {
     try { await fn(); log.push(`✅ ${label}`); } catch (e) { log.push(`❌ ${label}: ${e.description ?? e.message}`); }
   };
